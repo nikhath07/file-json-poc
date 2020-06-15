@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="38a47fd8-26c6-4a7c-956d-41c89dca7fcd" >
+		<db:generic-connection url="jdbc:postgresql://localhost:5432/Example" driverClassName="org.postgresql.Driver" user="postgres" password="POSTGRES" />
+	</db:config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="856d07c3-4631-4064-adb9-b07b2d3d4272" >
+		<file:connection workingDir="D:\Database" />
+	</file:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="914d220e-05f9-4a30-85ff-3e7b7fb51b15" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<json-logger:config name="JSON_Logger_Config1" doc:name="JSON Logger Config" doc:id="c49b3c8f-f88f-45aa-b56d-b15e12c28554" disabledFields='#["content"]'/>
+	<configuration-properties doc:name="Configuration properties" doc:id="4dc13644-93ba-4447-8112-c4d1a7e0f03f" file="config.yaml" />
+	<flow name="fileFlow" doc:id="8d237af0-df66-4cbf-a3e8-b3fd29f1b554" >
+		<http:listener doc:name="Listener" doc:id="c6700255-957f-4089-ba0e-0eccb2221066" config-ref="HTTP_Listener_config" path="/jsonlogger"/>
+		<file:read doc:id="3c1b627e-42e4-43e1-9182-0b2ac027e2a7" config-ref="File_Config" path="customer.csv"/>
+		<json-logger:logger doc:name="Logger" doc:id="2f87ff27-0d76-42bc-b0a3-6f97b7c0cee1" config-ref="JSON_Logger_Config1" applicationMessage="Database entry"/>
+		<logger level="INFO" doc:name="before insert" doc:id="50f441b5-f595-4a5b-9912-59d7e8249b84" message="#[payload]"/>
+		<db:bulk-insert doc:name="Bulk insert" doc:id="317d2931-248a-4e62-ba99-9aa858ec117e" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO customer (id,name,department)  Values (:id,:name,:department)]]></db:sql>
+		</db:bulk-insert>
+		<ee:transform doc:name="Transform Message" doc:id="c1ade4ba-c599-4473-bbaa-8a7935dc54dc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="Logger" doc:id="c90c9cd9-19ca-494e-9bb5-e585fdd17098" config-ref="JSON_Logger_Config1" applicationMessage="End" tracePoint="END">
+			<json-logger:content><![CDATA[#["message"]]]></json-logger:content>
+		</json-logger:logger>
+		<logger level="INFO" doc:name="after insertion" doc:id="204968f1-097f-4fa6-b35a-4d031545ce28" message='Message'/>
+	</flow>
+</mule>
