@@ -1,0 +1,28 @@
+{
+  "configs": [
+    "file.xml",
+    "new-test-suite.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:file:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.3.0",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedResources": [
+        "config.yaml",
+        "file.xml",
+        "log4j2.xml",
+        "log4j2-test.xml"
+      ],
+      "includeTestDependencies": "true",
+      "exportedPackages": []
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

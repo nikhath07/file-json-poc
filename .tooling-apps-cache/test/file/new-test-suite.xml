@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="new-test-suite.xml" />
+	<munit:test name="new-test-suite-fileFlowTest" doc:id="d3acd2c4-08ac-45b2-8334-04f461e9399c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fba927d9-39e6-42d5-ac96-9165ddbc9826" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Listener" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="c6700255-957f-4089-ba0e-0eccb2221066" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="HTTP_Listener_config" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="/jsonlogger" attributeName="path" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="cd2722ff-fe66-406c-b014-cc921a4d3a3d" processor="db:bulk-insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Bulk insert" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="317d2931-248a-4e62-ba99-9aa858ec117e" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<logger level="INFO" doc:name="success" doc:id="e68431ce-0acf-457f-adb9-8a92cadcafc1" message='#["success"]'/>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="6f14de3f-968b-47b7-b3ef-1b6abb512ba5" >
+				<munit:payload value="#[{method : 'GET' }]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to fileFlow" doc:id="e4e318af-20e3-4208-92da-c7ead7037de8" name="fileFlow"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>

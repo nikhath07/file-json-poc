@@ -1,0 +1,8 @@
+#JSON Logger configuration
+json:
+  logger:
+    application:
+      name: "astm-sys-ordermanagement"
+      version: "1.0.0"
+mule:
+  env: "4.2.2"
